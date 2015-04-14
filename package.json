@@ -1,0 +1,33 @@
+{
+  "name": "static-site-generator",
+  "version": "0.2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://bitbucket.org/oinkcommunication/static-site-generator.git"
+  },
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-connect-rewrite": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-connect": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-imagemin": "*",
+    "grunt-contrib-jade": "*",
+    "grunt-contrib-less": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-dev-update": "*",
+    "grunt-favicons": "*",
+    "grunt-ftp-deploy": "*",
+    "grunt-notify": "*",
+    "grunt-open": "*",
+    "grunt-robots-txt": "*",
+    "grunt-sitemap": "*",
+    "grunt-textfile": "*",
+    "imagemin-jpeg-recompress": "*",
+    "load-grunt-configs": "*",
+    "load-grunt-tasks": "*",
+    "time-grunt": "*"
+  }
+}
