@@ -11,10 +11,11 @@ document.body.appendChild(renderer.domElement);
 
 // Create a three.js scene.
 var scene = new THREE.Scene();
+//scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
 // Create a three.js camera.
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 5000);
-camera.position.set( 0, 100, 300 );
+camera.position.set( 0, 75, 300 );
 scene.add(camera);
 
 // Apply VR headset positional data to camera.
@@ -28,45 +29,59 @@ effect.setSize(window.innerWidth, window.innerHeight);
 var manager = new WebVRManager(renderer, effect);
 
 // Lights
-var light = new THREE.AmbientLight( 0x404040, 0.3 ); // soft white light
+var light = new THREE.AmbientLight( 0x202020, 0.1 ); // soft white light
 scene.add( light );
 
-var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+var dirLight = new THREE.DirectionalLight( 0xfff5c4, 0.5 );
 dirLight.position.set( 500, 1000, 100 );
 dirLight.castShadow = true;
-dirLight.shadowDarkness = 0.9;
+dirLight.shadowDarkness = 0.3;
 dirLight.shadowCameraNear = 100;
 dirLight.shadowCameraFar = camera.far;
 dirLight.shadowMapWidth = 2048;
 dirLight.shadowMapHeight = 2048;
-//dirLight.shadowCameraVisible = true;
-
+// dirLight.shadowCameraVisible = true;
 scene.add( dirLight );
+
+var spotLightCenter = new THREE.Object3D();
+spotLightCenter.position.set( 0, 1000, 0 );
+scene.add( spotLightCenter );
+
+var spotLight = new THREE.SpotLight( 0xfffde8, 0.6 );
+spotLight.position.set( 1500, 0, 0 );
+spotLight.castShadow = true;
+spotLight.shadowDarkness = 0.6;
+spotLight.shadowCameraNear = 100;
+spotLight.shadowCameraFar = camera.far;
+spotLight.shadowMapWidth = 2048;
+spotLight.shadowMapHeight = 2048;
+// spotLight.shadowCameraVisible = true;
+spotLightCenter.add( spotLight );
 
 // Materials
 var material = new THREE.MeshPhongMaterial( { 
     color: 0x22FF88, 
     specular: 0x050505,
-    shininess: 20,
+    shininess: 100,
     shading: THREE.FlatShading,
-    opacity: 0.5
     //wireframe: true
 } );
 
 // Textures
-var bumpTexFloor = THREE.ImageUtils.loadTexture("img/textures/stone-bump.jpg");
+var bumpTexFloor = THREE.ImageUtils.loadTexture("img/textures/wall-bump.jpg");
 bumpTexFloor.wrapS = THREE.RepeatWrapping;
 bumpTexFloor.wrapT = THREE.RepeatWrapping;
-bumpTexFloor.repeat = new THREE.Vector2(20, 20);
+bumpTexFloor.repeat = new THREE.Vector2(10, 10);
 bumpTexFloor.anisotropy = renderer.getMaxAnisotropy();
 
 // Materials
 var materialFloor = new THREE.MeshPhongMaterial( { 
-    color: 0x2288FF,
+    color: 0xCFC9C1,
     specular: 0xCCDDF6,
-    shininess: 75,
+    shininess: 5,
+    specularMap: bumpTexFloor,
     bumpMap: bumpTexFloor,
-    bumpScale: 0.9
+    bumpScale: 0.2
 } );
 
 // Floor
@@ -80,7 +95,7 @@ var textGeom = new THREE.TextGeometry( 'Oink', {
         font: 'helvetiker', // Must be lowercase!
         size: 100,
         height: 30,
-        curveSegments: 1.5
+        curveSegments: 5
     });
 textGeom.center();
 var text = new THREE.Mesh( textGeom, material );
@@ -120,6 +135,19 @@ torus.position.z = -100;
 torus.castShadow = true;
 scene.add( torus );
 
+// postprocessing
+var composer = new THREE.EffectComposer( renderer );
+composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+var dotScreenEffect = new THREE.ShaderPass( THREE.DotScreenShader );
+dotScreenEffect.uniforms[ 'scale' ].value = 4;
+composer.addPass( dotScreenEffect );
+
+var rgbEffect = new THREE.ShaderPass( THREE.RGBShiftShader );
+rgbEffect.uniforms[ 'amount' ].value = 0.0015;
+rgbEffect.renderToScreen = true;
+composer.addPass( rgbEffect );
+
 // Request animation frame loop function
 function animate() {
   // Apply rotation to objects
@@ -135,13 +163,16 @@ function animate() {
   torus.rotation.x -= 0.01;
   torus.rotation.y += 0.03;
   torus.rotation.z -= 0.02;
-  text.rotation.y += 0.015
+  text.rotation.y -= 0.015
+  spotLightCenter.rotation.y += 0.02
 
   // Update VR headset position and apply to camera.
   controls.update();
 
   // Render the scene through the manager.
   manager.render(scene, camera);
+
+  composer.render();
 
   requestAnimationFrame( animate );
 }

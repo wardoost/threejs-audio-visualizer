@@ -2,8 +2,8 @@ module.exports = function (grunt) {
   //----------------------------------------------
   //- Global variables
   //----------------------------------------------
-  var deployDomain = 'oink-communicatie.be'; // No trailing slash, no subdomain
-  var deploySubDir = 'innovation/webvr/'; // Trailing slash
+  var deployDomain = 'oink.be'; // No trailing slash, no subdomain
+  var deploySubDir = 'webvr/'; // Trailing slash
   var deployURL = 'www.' + deployDomain + '/' + deploySubDir;
 
   // Read package.json

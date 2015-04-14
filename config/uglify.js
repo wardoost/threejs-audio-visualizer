@@ -24,6 +24,8 @@ module.exports = function(grunt, options){
         'src/js/body/libs/webvr-manager.js', // Helps enter and exit VR mode, provides best practices while in VR.
         'src/js/body/libs/*.js',
         'src/js/body/fonts/*.js',
+        'src/js/body/shaders/*.js',
+        'src/js/body/postprocessing/*.js',
         'src/js/body/main.js',
       ],
       dest: 'build/<%= grunt.option("deploySubDir") %>assets/body.min.js'
