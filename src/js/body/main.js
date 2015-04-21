@@ -1,10 +1,10 @@
-var renderer, scene, camera;
+var renderer, scene, camera, cameraPivot;
 var controls, effect, manager;
 var light, dirLight, dirLight;
-var greenMat, blueMat, whiteWF;
+var greenMat, blueMat, whiteMatWF;
 var terrain, cubesCenter;
 var cubes = new Array();
-var drawingDistance = 1000;
+var drawingDistance = 2000;
 var amount = 8;
 
 init(); // Initiante scene
@@ -32,8 +32,11 @@ function init(){
   scene.fog = new THREE.Fog( 0x000000, drawingDistance / 4 , drawingDistance );
 
   // Create a three.js camera.
+  cameraPivot = new THREE.Object3D();
+  cameraPivot.position.y = 20;
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10 * drawingDistance);
-  scene.add(camera);
+  cameraPivot.add(camera);
+  scene.add(cameraPivot);
 
   // Apply VR headset positional data to camera.
   controls = new THREE.VRControls(camera);
@@ -56,10 +59,11 @@ function init(){
 
   dirLight = new THREE.DirectionalLight( 0xfff5c4, 0.9 );
   dirLight.castShadow = true;
-  // dirLight.shadowCameraVisible = true;
+  dirLight.shadowCameraVisible = true;
   dirLight.shadowMapWidth = 1024;
   dirLight.shadowMapHeight = 1024;
-  dirLight.position.set( 1000, 1000, 0 );
+  dirLight.shadowCameraFar = Math.sqrt(Math.pow(2 * drawingDistance, 2) + Math.pow(drawingDistance, 2));
+  dirLight.position.set( drawingDistance, drawingDistance, 0 );
   scene.add( dirLight );
 
   // -------------------------------------------------
@@ -79,7 +83,7 @@ function init(){
     // wireframe: true
   });
 
-  whiteWF = new THREE.MeshLambertMaterial({
+  whiteMatWF = new THREE.MeshLambertMaterial({
     color: 0xFFFFFF,
     shading: THREE.FlatShading,
     wireframe: true
@@ -90,16 +94,15 @@ function init(){
   // OBJECTS
   // -------------------------------------------------
 
-  terrain = generateTerrain("heightmap", drawingDistance * 2, 500, drawingDistance * 2);
-  terrain.position.set(0, -20, 0);
+  terrain = generateTerrain("heightmap", drawingDistance * 2, 1000, drawingDistance * 2);
   terrain.receiveShadow = true;
   scene.add( terrain );
 
   // Cubes
-  var radius = 50;
-  var size = 10;
+  var radius = 150;
+  var size = 50;
   cubesCenter = new THREE.Object3D();
-  cubesCenter.position.set(0, -20, 0);
+  cubesCenter.position.set(0, 0, 0);
   for(var i = 0; i < 256 / amount; i++) {
     var geometry = new THREE.BoxGeometry(size, size, size);
     geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, size / 2, 0 ));
@@ -159,6 +162,9 @@ function generateTerrain(heightMap, width, height, depth) {
 function animate() {
 
   cubesCenter.rotation.y += 0.005;
+  if(cameraPivot.position.y < drawingDistance / 2){
+    cameraPivot.position.y += 0.05;
+  }
 
   if(typeof array === 'object' && array.length > 0) {
     var k = 0;
