@@ -6,10 +6,10 @@ module.exports = function(grunt, options){
       src: ['fonts/*.{eot,svg,ttf,woff}'],
       dest: 'build/<%= grunt.option("deploySubDir") %>assets'
     },
-    php: {
+    assets:{
       expand: true,
       cwd: 'src',
-      src: ['**/*.php'],
+      src: ['assets/*.{pdf,mp3,m4a}'],
       dest: 'build/<%= grunt.option("deploySubDir") %>'
     }
   }

@@ -3,3 +3,8 @@ extends layouts/base
 block vars
   -pageTitle = "Test environment"; //- Custom page title
   -metaKeywordsPage = ""; //- Extra keywords for this page
+
+block content
+  #assets
+    img(src="img/textures/heightmap.png")#heightmap
+  canvas#canvas

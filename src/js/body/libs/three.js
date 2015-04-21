@@ -18290,6 +18290,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getSize = function () {
+
+		return {
+			width: _canvas.width,
+			height: _canvas.height
+		};
+
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
 
 		_canvas.width = width * pixelRatio;

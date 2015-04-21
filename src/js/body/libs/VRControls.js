@@ -67,7 +67,7 @@ THREE.VRControls = function ( object, onError ) {
 	// this scale factor allows the user to define how meters
 	// are converted to scene units.
 
-	this.scale = 1;
+	this.scale = 20;
 
 	this.update = function () {
 
