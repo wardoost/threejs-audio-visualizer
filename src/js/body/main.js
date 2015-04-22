@@ -1,8 +1,9 @@
 var renderer, scene, camera, cameraPivot;
 var controls, effect, manager;
 var light, dirLight, dirLight;
-var greenMat, blueMat, whiteMatWF;
-var terrain, cubesCenter;
+var greenMat, blueMat, whiteMat;
+var terrain, cubesCenter, selector;
+var selectorRadius = 100;
 var cubes = new Array();
 var drawingDistance = 2000;
 var amount = 8;
@@ -21,15 +22,15 @@ function init(){
   renderer.setPixelRatio(window.devicePixelRatio);
 
   // Enable shadows
-  renderer.shadowMapEnabled = true;
-  renderer.shadowMapType = THREE.PCFShadowMap;
+  // renderer.shadowMapEnabled = true;
+  // renderer.shadowMapType = THREE.PCFShadowMap;
 
   // Append the canvas element created by the renderer to document body element.
   document.body.appendChild(renderer.domElement);
 
   // Create a three.js scene.
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog( 0x000000, drawingDistance / 4 , drawingDistance );
+  scene.fog = new THREE.Fog( 0x000000, drawingDistance / 5 , drawingDistance );
 
   // Create a three.js camera.
   cameraPivot = new THREE.Object3D();
@@ -59,7 +60,7 @@ function init(){
 
   dirLight = new THREE.DirectionalLight( 0xfff5c4, 0.9 );
   dirLight.castShadow = true;
-  dirLight.shadowCameraVisible = true;
+  //dirLight.shadowCameraVisible = true;
   dirLight.shadowMapWidth = 1024;
   dirLight.shadowMapHeight = 1024;
   dirLight.shadowCameraFar = Math.sqrt(Math.pow(2 * drawingDistance, 2) + Math.pow(drawingDistance, 2));
@@ -83,7 +84,7 @@ function init(){
     // wireframe: true
   });
 
-  whiteMatWF = new THREE.MeshLambertMaterial({
+  whiteMat = new THREE.MeshLambertMaterial({
     color: 0xFFFFFF,
     shading: THREE.FlatShading,
     wireframe: true
@@ -94,7 +95,8 @@ function init(){
   // OBJECTS
   // -------------------------------------------------
 
-  terrain = generateTerrain("heightmap", drawingDistance * 2, 1000, drawingDistance * 2);
+  // Terrain
+  terrain = generateTerrain("heightmap", drawingDistance * 2, 500, drawingDistance * 2);
   terrain.receiveShadow = true;
   scene.add( terrain );
 
@@ -109,15 +111,34 @@ function init(){
     geometry.castShadow = true;
 
     cubes[i] = new THREE.Mesh(geometry, greenMat);    
-    cubes[i].position.set(radius * Math.cos(i / amount * Math.PI * 2), 0, radius * Math.sin(i / amount * Math.PI * 2));
+    cubes[i].position.x = -radius * Math.cos(i / amount * Math.PI * 2);
+    cubes[i].position.z = radius * Math.sin(i / amount * Math.PI * 2);
     cubes[i].rotation.y = -i / amount * Math.PI * 2;
 
     cubesCenter.add(cubes[i]);
   }
-  scene.add(cubesCenter);
+  //scene.add(cubesCenter);
+
+  // Selector
+  var geometry = new THREE.CircleGeometry(10, 16);
+  selector = new THREE.Mesh(geometry, whiteMat);
+  var vec = new THREE.Vector3( 0, 0, -selectorRadius );
+  vec.applyQuaternion( camera.quaternion );
+  selector.position.x = vec.x;
+  selector.position.z = vec.z;
+  selector.rotation.x = -Math.PI / 2;
+  scene.add(selector);
+
+  var cube = new THREE.Mesh(new THREE.CubeGeometry(8, 8, 8), greenMat);
+  cube.position.z = -selectorRadius;
+  scene.add(cube);  
 }
 
-// Function to generate terrain
+
+
+// -------------------------------------------------
+// GERERATE TERRAIN
+// -------------------------------------------------
 function generateTerrain(heightMap, width, height, depth) {
   var heightMap = heightMap || "heightmap";
   var width = width || 100;
@@ -158,13 +179,24 @@ function generateTerrain(heightMap, width, height, depth) {
   return terrain;
 }
 
-// Request animation frame loop function
+// -------------------------------------------------
+// REQUEST ANIMATION FRAME LOOP FUNCTION
+// -------------------------------------------------
 function animate() {
 
+  // Rotate cubes
   cubesCenter.rotation.y += 0.005;
+
+  // Reposition selector
+  var vec = new THREE.Vector3( 0, 0, -selectorRadius );
+  vec.applyQuaternion( camera.quaternion );
+  selector.position.x = vec.x;
+  selector.position.z = vec.z;
+  
+  /*/ Elevate camera  
   if(cameraPivot.position.y < drawingDistance / 2){
     cameraPivot.position.y += 0.05;
-  }
+  }*/
 
   if(typeof array === 'object' && array.length > 0) {
     var k = 0;
@@ -181,10 +213,13 @@ function animate() {
   // Render the scene through the manager.
   manager.render(scene, camera);
 
-  requestAnimationFrame( animate );
+  // Limit framerate to max 60fps
+  setTimeout( function() { requestAnimationFrame( animate ); }, 1000 / 60 );
 }
 
-// Listen for keyboard event and zero positional sensor on appropriate keypress.
+// -------------------------------------------------
+// LISTEN FOR KEYBOARD EVENT AND ZERO POSITIONAL SENSOR ON APPROPRIATE KEYPRESS.
+// -------------------------------------------------
 function onKey(event) {
   if (event.keyCode == 90) { // z
     controls.zeroSensor();
@@ -193,8 +228,9 @@ function onKey(event) {
 
 window.addEventListener('keydown', onKey, true);
 
-
-// Handle window resizes
+// -------------------------------------------------
+// HANDLE WINDOW RESIZES
+// -------------------------------------------------
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
