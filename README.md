@@ -1,6 +1,6 @@
-#WebVR Boilerplate
+#Three.js Audio Visualizer
 
-A starting point for web-based VR experiences that work well in both Google Cardboard and Oculus Rift. Also provides a good fallback for experiencing the same content without requiring a VR device. Based on [borismus](https://github.com/borismus)' [WebVR Boilerplate](https://github.com/borismus/webvr-boilerplate).
+A three.js starting point for visualizing audio. Web VR build in. Based on [borismus](https://github.com/borismus)' [WebVR Boilerplate](https://github.com/borismus/webvr-boilerplate) and [](https://github.com/srchea) his [Sound-Visualizer](https://github.com/srchea/Sound-Visualizer/).
 
 *****
 

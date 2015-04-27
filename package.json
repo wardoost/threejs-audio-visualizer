@@ -1,6 +1,10 @@
 {
   "name": "threejs-audio-visualizer",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:wardoost/threejs-audio-visualizer.git"
+  },
   "devDependencies": {
     "grunt": "*",
     "grunt-connect-rewrite": "*",
