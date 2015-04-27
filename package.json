@@ -1,10 +1,6 @@
 {
-  "name": "static-site-generator",
-  "version": "0.2.0",
-  "repository": {
-    "type": "git",
-    "url": "git://bitbucket.org/oinkcommunication/static-site-generator.git"
-  },
+  "name": "threejs-audio-visualizer",
+  "version": "0.1.0",
   "devDependencies": {
     "grunt": "*",
     "grunt-connect-rewrite": "*",

@@ -1,12 +1,12 @@
 var renderer, scene, camera, cameraPivot;
 var controls, effect, manager;
 var light, dirLight, dirLight;
-var greenMat, blueMat, whiteMat;
+var greenMat, blackMat, whiteMat, whiteWFMat;
 var terrain, cubesCenter, selector;
 var selectorRadius = 100;
 var cubes = new Array();
-var drawingDistance = 2000;
-var amount = 8;
+var drawingDistance = 500;
+var amount = 128;
 
 init(); // Initiante scene
 animate(); // Kick off animation loop
@@ -30,11 +30,12 @@ function init(){
 
   // Create a three.js scene.
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog( 0x000000, drawingDistance / 5 , drawingDistance );
+  scene.fog = new THREE.Fog( 0xCCCCCC, drawingDistance / 5 , drawingDistance );
 
   // Create a three.js camera.
   cameraPivot = new THREE.Object3D();
-  cameraPivot.position.y = 20;
+  cameraPivot.position.y = 2000;
+  cameraPivot.rotation.x = -Math.PI / 2;
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10 * drawingDistance);
   cameraPivot.add(camera);
   scene.add(cameraPivot);
@@ -60,10 +61,10 @@ function init(){
 
   dirLight = new THREE.DirectionalLight( 0xfff5c4, 0.9 );
   dirLight.castShadow = true;
-  //dirLight.shadowCameraVisible = true;
+  dirLight.shadowCameraVisible = true;
   dirLight.shadowMapWidth = 1024;
   dirLight.shadowMapHeight = 1024;
-  dirLight.shadowCameraFar = Math.sqrt(Math.pow(2 * drawingDistance, 2) + Math.pow(drawingDistance, 2));
+  dirLight.shadowCameraFar = drawingDistance * 3;
   dirLight.position.set( drawingDistance, drawingDistance, 0 );
   scene.add( dirLight );
 
@@ -78,16 +79,27 @@ function init(){
     // wireframe: true
   });
 
-  blueMat = new THREE.MeshLambertMaterial({ 
-    color: 0x1b3349, 
+  blackMat = new THREE.MeshLambertMaterial({ 
+    color: 0x030303, 
+    shading: THREE.FlatShading
+  });
+
+  blackWFMat = new THREE.MeshLambertMaterial({ 
+    color: 0x030303, 
     shading: THREE.FlatShading,
-    // wireframe: true
+    wireframe: true
+  });
+
+  whiteWFMat = new THREE.MeshLambertMaterial({ 
+    color: 0xFFFFFF, 
+    shading: THREE.FlatShading,
+    wireframe: true
   });
 
   whiteMat = new THREE.MeshLambertMaterial({
     color: 0xFFFFFF,
     shading: THREE.FlatShading,
-    wireframe: true
+    specular: 0xFFFFFF
   });
 
 
@@ -96,42 +108,42 @@ function init(){
   // -------------------------------------------------
 
   // Terrain
-  terrain = generateTerrain("heightmap", drawingDistance * 2, 500, drawingDistance * 2);
-  terrain.receiveShadow = true;
+  terrain = generateTerrain("heightmap", blackWFMat, drawingDistance * 2, 1500, drawingDistance * 2);
+  // terrain.receiveShadow = true;
   scene.add( terrain );
 
   // Cubes
-  var radius = 150;
-  var size = 50;
+  var radius = 60;
+  var size = 10;
   cubesCenter = new THREE.Object3D();
   cubesCenter.position.set(0, 0, 0);
-  for(var i = 0; i < 256 / amount; i++) {
+  for(var i = 0; i < amount; i++) {
     var geometry = new THREE.BoxGeometry(size, size, size);
     geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, size / 2, 0 ));
-    geometry.castShadow = true;
+    // geometry.castShadow = true;
 
-    cubes[i] = new THREE.Mesh(geometry, greenMat);    
+    cubes[i] = new THREE.Mesh(geometry, whiteMat);    
     cubes[i].position.x = -radius * Math.cos(i / amount * Math.PI * 2);
     cubes[i].position.z = radius * Math.sin(i / amount * Math.PI * 2);
-    cubes[i].rotation.y = -i / amount * Math.PI * 2;
+    //cubes[i].rotation.y = -i / amount * Math.PI * 2;
 
     cubesCenter.add(cubes[i]);
   }
-  //scene.add(cubesCenter);
+  scene.add(cubesCenter);
 
   // Selector
   var geometry = new THREE.CircleGeometry(10, 16);
-  selector = new THREE.Mesh(geometry, whiteMat);
+  selector = new THREE.Mesh(geometry, whiteWFMat);
   var vec = new THREE.Vector3( 0, 0, -selectorRadius );
   vec.applyQuaternion( camera.quaternion );
   selector.position.x = vec.x;
   selector.position.z = vec.z;
   selector.rotation.x = -Math.PI / 2;
-  scene.add(selector);
+  //scene.add(selector);
 
-  var cube = new THREE.Mesh(new THREE.CubeGeometry(8, 8, 8), greenMat);
+  var cube = new THREE.Mesh(new THREE.CubeGeometry(8, 8, 8), whiteMat);
   cube.position.z = -selectorRadius;
-  scene.add(cube);  
+  //scene.add(cube);  
 }
 
 
@@ -139,8 +151,7 @@ function init(){
 // -------------------------------------------------
 // GERERATE TERRAIN
 // -------------------------------------------------
-function generateTerrain(heightMap, width, height, depth) {
-  var heightMap = heightMap || "heightmap";
+function generateTerrain(heightMap, material, width, height, depth) {
   var width = width || 100;
   var height = height || 100;
   var depth = depth || 100;
@@ -170,7 +181,7 @@ function generateTerrain(heightMap, width, height, depth) {
   terrainGeometry.computeFaceNormals();
   terrainGeometry.computeVertexNormals();
 
-  var terrain = new THREE.Mesh(terrainGeometry, blueMat);
+  var terrain = new THREE.Mesh(terrainGeometry, material);
 
   var q = new THREE.Quaternion();
   q.setFromAxisAngle( new THREE.Vector3(-1, 0, 0), 90 * Math.PI / 180 );
@@ -193,15 +204,15 @@ function animate() {
   selector.position.x = vec.x;
   selector.position.z = vec.z;
   
-  /*/ Elevate camera  
-  if(cameraPivot.position.y < drawingDistance / 2){
-    cameraPivot.position.y += 0.05;
-  }*/
+  // Elevate camera  
+  if(cameraPivot.position.y > drawingDistance / 2){
+    cameraPivot.position.y -= 0.5 * 8;
+  }
 
   if(typeof array === 'object' && array.length > 0) {
     var k = 0;
     for(var i = 0; i < cubes.length; i++) {
-        var scale = (array[k] + boost) / 20;
+        var scale = (array[k] + boost) / 40;
         cubes[i].scale.y = (scale < 1 ? 1 : scale);
         k += (k < array.length ? 1 : 0);
     }

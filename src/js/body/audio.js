@@ -1,4 +1,4 @@
-/*var context;
+var context;
 var source, sourceJs;
 var analyser;
 var url = 'assets/shipibo-icaro.mp3';
@@ -81,4 +81,4 @@ function displayTime(time) {
 
 function play() {
 	source.start(0);
-}*/
+}
