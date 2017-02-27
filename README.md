@@ -32,11 +32,11 @@ grunt
 
 ###Gruntfile.js
 - **deployDomain**: Your domain name without trailing slash nor subdomain. Site will be deployed to this server and domain will be used for absolute links
-> oink.be
+> example.com
 - **deploySubDir**: Subdirectory where your website will be uploaded to.
 > deploy-sub-dir/
 - **deployURL**: Url composed of deployDomain and deploySubDir.
-> www.oink.be/deploy-sub-dir/
+> www.example.com/deploy-sub-dir/
 
 ###example.jade (or other jade file)
 - **websiteTitle**: Website title in title case. Derived from project directory name. Logically overwritten in base.jade.
@@ -50,9 +50,9 @@ grunt
 - **deploySubDir**: DeploySubDir as defined in Gruntfile.js.
 > deploy-sub-dir/
 - **deployUrl**: Url to website derived from deployDomain and deploySubDir in Gruntfile.js.
-> http://www.oink.be/deploy-sub-dir/
+> http://www.example.com/deploy-sub-dir/
 - **absoluteUrl**: Absolute url to the current page based on deployUrl from gruntfile.js and filename.
-> http://www.oink.be/deploy-sub-dir/example-dir/example
+> http://www.example.com/deploy-sub-dir/example-dir/example
 - **timeStamp**: Date of today, format: DD/MM/YYYY
 > 09/04/2015
 

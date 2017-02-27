@@ -3,11 +3,7 @@ var jpegRecompress = require('imagemin-jpeg-recompress');
 module.exports = function(grunt, options){
   return {
     options: {
-      progressive: true,
-      use: [jpegRecompress({
-        quality: 'veryhigh',
-        loops: 4
-      })]
+      progressive: true
     },
     images: {
       files: [{

@@ -7,7 +7,7 @@ module.exports = function(grunt, options){
         authKey: 'key1'
       },
       src: 'build/<%= grunt.option("deploySubDir") %>',
-      dest: 'oink/<%= grunt.option("deploySubDir") %>',
+      dest: 'audio-visualizer/<%= grunt.option("deploySubDir") %>',
       exclusions: ['build/<%= grunt.option("deploySubDir") %>**/.DS_Store',
                    'build/<%= grunt.option("deploySubDir") %>**/Thumbs.db'],
       forceVerbose: true
